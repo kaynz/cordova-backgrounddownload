@@ -171,8 +171,9 @@ public class BackgroundDownload extends CordovaPlugin {
 
             DownloadManager mgr = (DownloadManager) this.cordova.getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Request request = new DownloadManager.Request(source);
-            request.setTitle("org.apache.cordova.backgroundDownload plugin");
-            request.setVisibleInDownloadsUi(false);
+            request.setTitle("Trazee Update");
+			request.addRequestHeader("Authorization", "Basic YWRtaW46VHJhemVlMjAxNA==");
+            //request.setVisibleInDownloadsUi(false);
 
             // hide notification. Not compatible with current android api.
             // request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
@@ -391,6 +392,10 @@ public class BackgroundDownload extends CordovaPlugin {
         File sourceFile = new File(Uri.parse(curDownload.getTempFilePath()).getPath());
         File destFile = new File(Uri.parse(curDownload.getFilePath()).getPath());
         if (sourceFile.renameTo(destFile)) {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(destFile), "application/vnd.android.package-archive");
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			cordova.getActivity().startActivity(intent);
             curDownload.getCallbackContextDownloadStart().success();
         } else {
             curDownload.getCallbackContextDownloadStart().error("Cannot copy from temporary path to actual path");
